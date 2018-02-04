@@ -4,14 +4,16 @@ gi.require_version('AppIndicator3', '0.1');
 from gi.repository import Gtk, AppIndicator3, GObject
 from threading import Thread
 from configparser import ConfigParser
+from lang import *
 
 class Indicator():
     def __init__(self):
         self.app = 'show_proc';
         config = ConfigParser();
         config.read('config.ini');
+        self.language = config.get('settings', 'language');
         self.refresh_rate = config.getint('settings', 'refresh_rate');
-        self.station = config.getint('settings', 'station');
+        self.station = config.getint('settings', 'station_id');
 
         currpath = os.path.dirname(os.path.realpath(__file__));
         self.icon_small = currpath + '/img/nsb_small.png';
@@ -26,21 +28,43 @@ class Indicator():
         self.update.setDaemon(True);
         self.update.start();
 
-        self.getStation();
+        self.trainInfo();
 
     def create_menu(self):
         menu = Gtk.Menu();
 
-        item_git = Gtk.MenuItem('Open GitHub');
+        item_settings = Gtk.MenuItem(translate("settings", self.language));
+        item_settings.connect('activate', self.settings);
+
+        item_git = Gtk.MenuItem(translate("open", self.language));
         item_git.connect('activate', self.github);
 
-        item_quit = Gtk.MenuItem('Quit');
+        item_quit = Gtk.MenuItem(translate("quit", self.language));
         item_quit.connect('activate', self.stop);
 
+        menu.append(item_settings);
         menu.append(item_git);
         menu.append(item_quit);
         menu.show_all();
         return menu;
+
+    def trainInfo(self):
+        api = ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
+
+        with urllib.request.urlopen(api) as url:
+            api = url.read().decode();
+            api = api.replace('(', '');
+            api = api.replace(')', '');
+            api = api.replace('?', '');
+            api = api.replace(';', '');
+            data = json.loads(api);
+            data_size = len(data);
+
+            for i in range(0, data_size):
+                destination_name = data[i]['MonitoredVehicleJourney']['DestinationName'];
+                departure_time = data[i]['MonitoredVehicleJourney']['MonitoredCall']['AimedDepartureTime'];
+                print(destination_name, departure_time);
+            #return district;
 
     def getStation(self):
         api = ('http://reisapi.ruter.no/Place/GetStop/%i?callback=?' % self.station);
@@ -68,6 +92,9 @@ class Indicator():
             s.call(['notify-send', '-i', self.icon_large, 'Bitcoin Price Indicator', ('Hurray! Bitcoin price has reached $%s.' % round(price))]);
         elif(minAlert >= price):
             s.call(['notify-send', '-i', self.icon_large, 'Bitcoin Price Indicator', ('Oh no! Bitcoin price has dropped to $%s.' % round(price))]);
+
+    def settings(self, source):
+        os.system('xdg-open config.ini')
 
     def github(self, source):
         webbrowser.open('https://github.com/sirajuddin97/NSBAlert');
