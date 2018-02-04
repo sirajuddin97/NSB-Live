@@ -1,2 +1,2 @@
-# NSBAlert
-Desktop notifications for Ubuntu from NSB trains
+# NSB-Alert
+This project is still in development.
