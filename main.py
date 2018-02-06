@@ -5,6 +5,7 @@ from gi.repository import Gtk, AppIndicator3, GObject
 from threading import Thread
 from configparser import ConfigParser
 from dateutil import parser
+from datetime import datetime
 from translate import *
 
 class Indicator():
@@ -37,8 +38,31 @@ class Indicator():
         item_departures.set_submenu(submenu);
         menu.append(item_departures);
 
-        for i in range(0, self.getTrainAmount()):
-            submenu.append(Gtk.MenuItem(self.trainInfo()));
+        api = ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
+        with urllib.request.urlopen(api) as url:
+            api = url.read().decode();
+            api = api.replace('(', '');
+            api = api.replace(')', '');
+            api = api.replace('?', '');
+            api = api.replace(';', '');
+            data = json.loads(api);
+            data_size = len(data);
+
+            for i in range(0, data_size):
+                destination_name = data[i]['MonitoredVehicleJourney']['DestinationName'];
+                platform = data[i]['MonitoredVehicleJourney']['MonitoredCall']['DeparturePlatformName'];
+                departure_time = data[i]['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'];
+
+                dt = parser.parse(departure_time);
+                dt = "{}:{}".format(dt.hour, dt.minute);
+                now = time.strftime('%H:%M');
+                FMT = '%H:%M';
+                tdelta = datetime.strptime(dt, FMT) - datetime.strptime(now, FMT);
+                if str(tdelta) < '0:20':
+                    self.trainAlert(destination_name, dt, platform);
+
+                train = ('%s til %s - %s (Spor %s)' % (self.getStation(), destination_name, dt, platform));
+                submenu.append(Gtk.MenuItem(train));
 
         item_separator = Gtk.SeparatorMenuItem();
         menu.append(item_separator);
@@ -58,38 +82,6 @@ class Indicator():
         menu.show_all();
         return menu;
 
-    def getTrainAmount(self):
-        api = ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
-
-        with urllib.request.urlopen(api) as url:
-            api = url.read().decode();
-            api = api.replace('(', '');
-            api = api.replace(')', '');
-            api = api.replace('?', '');
-            api = api.replace(';', '');
-            data = json.loads(api);
-            return len(data);
-
-    def trainInfo(self):
-        api = ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
-
-        with urllib.request.urlopen(api) as url:
-            api = url.read().decode();
-            api = api.replace('(', '');
-            api = api.replace(')', '');
-            api = api.replace('?', '');
-            api = api.replace(';', '');
-            data = json.loads(api);
-            data_size = len(data);
-
-            for i in range(0, data_size):
-                destination_name = data[i]['MonitoredVehicleJourney']['DestinationName'];
-                platform = data[i]['MonitoredVehicleJourney']['MonitoredCall']['DeparturePlatformName'];
-                departure_time = data[i]['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'];
-                dt = parser.parse(departure_time);
-                dt = "{}:{}".format(dt.hour, dt.minute);
-                return ("%s til %s - %s (Spor %s)" % (self.getStation(), destination_name, dt, platform));
-
     def getStation(self):
         api = ('http://reisapi.ruter.no/Place/GetStop/%i?callback=?' % self.station);
 
@@ -108,14 +100,8 @@ class Indicator():
             time.sleep(self.refresh_rate);
             GObject.idle_add(self.ind.set_label, self.getStation(), self.app, priority = GObject.PRIORITY_DEFAULT);
 
-    def priceAlert(self, price):
-        minAlert = 9000;
-        maxAlert = 11000;
-
-        if(maxAlert <= price):
-            s.call(['notify-send', '-i', self.icon_large, 'NSBAlert', ('Hurray! Bitcoin price has reached $%s.' % round(price))]);
-        elif(minAlert >= price):
-            s.call(['notify-send', '-i', self.icon_large, 'NSBAlert', ('Oh no! Bitcoin price has dropped to $%s.' % round(price))]);
+    def trainAlert(self, destination_name, dt, platform):
+        s.call(['notify-send', '-i', self.icon_large, 'NSBAlert', ('Toget fra %s til %s kjører klokken %s fra spor %s.' % (self.getStation(), destination_name, dt, platform))]);
 
     def settings(self, source):
         os.system('xdg-open config.ini')
