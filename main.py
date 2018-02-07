@@ -56,8 +56,7 @@ class Indicator():
                 dt = parser.parse(departure_time);
                 dt = "{}:{}".format(dt.hour, dt.minute);
                 now = time.strftime('%H:%M');
-                FMT = '%H:%M';
-                tdelta = datetime.strptime(dt, FMT) - datetime.strptime(now, FMT);
+                tdelta = datetime.strptime(dt, '%H:%M') - datetime.strptime(now, '%H:%M');
                 if str(tdelta) < '0:20':
                     self.trainAlert(destination_name, dt, platform);
 
