@@ -30,6 +30,12 @@ class Indicator():
         self.update.setDaemon(True);
         self.update.start();
 
+    def getAPI(self, type):
+        if type == 1:
+            return ('http://reisapi.ruter.no/Place/GetStop/%i?callback=?' % self.station);
+        if type == 2:
+            return ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
+
     def create_menu(self):
         menu = Gtk.Menu();
         submenu = Gtk.Menu();
@@ -38,7 +44,7 @@ class Indicator():
         item_departures.set_submenu(submenu);
         menu.append(item_departures);
 
-        api = ('http://reisapi.ruter.no/StopVisit/GetDepartures/%i?transporttypes=Train&callback=?' % self.station);
+        api = self.getAPI(2);
         with urllib.request.urlopen(api) as url:
             api = url.read().decode();
             api = api.replace('(', '');
@@ -57,7 +63,7 @@ class Indicator():
                 dt = "{}:{}".format(dt.hour, dt.minute);
                 now = time.strftime('%H:%M');
                 tdelta = datetime.strptime(dt, '%H:%M') - datetime.strptime(now, '%H:%M');
-                if str(tdelta) < '0:20':
+                if str(tdelta) < '0:50':
                     self.trainAlert(destination_name, dt, platform);
 
                 train = ('%s til %s - %s (Spor %s)' % (self.getStation(), destination_name, dt, platform));
@@ -82,8 +88,7 @@ class Indicator():
         return menu;
 
     def getStation(self):
-        api = ('http://reisapi.ruter.no/Place/GetStop/%i?callback=?' % self.station);
-
+        api = self.getAPI(1);
         with urllib.request.urlopen(api) as url:
             api = url.read().decode();
             api = api.replace('(', '');
@@ -97,7 +102,11 @@ class Indicator():
     def refreshPrice(self):
         while True:
             time.sleep(self.refresh_rate);
-            GObject.idle_add(self.ind.set_label, self.getStation(), self.app, priority = GObject.PRIORITY_DEFAULT);
+            print("test");
+            self.create_menu();
+
+            #GObject.idle_add(self.ind.set_label, self.getStation(), self.app, priority = GObject.PRIORITY_DEFAULT);
+            # GObject.idle_add(self.create_menu(), priority = GObject.PRIORITY_DEFAULT);
 
     def trainAlert(self, destination_name, dt, platform):
         s.call(['notify-send', '-i', self.icon_large, 'NSBAlert', ('Toget fra %s til %s kjører klokken %s fra spor %s.' % (self.getStation(), destination_name, dt, platform))]);
