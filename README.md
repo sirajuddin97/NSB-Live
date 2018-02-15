@@ -1,4 +1,4 @@
-# NSB Alert
+# NSB Live
 This project is still in development. I will update this README with some pictures soon.
 
 ## Donations

@@ -109,7 +109,7 @@ class Indicator():
             # GObject.idle_add(self.create_menu(), priority = GObject.PRIORITY_DEFAULT);
 
     def trainAlert(self, destination_name, dt, platform):
-        s.call(['notify-send', '-i', self.icon_large, 'NSBAlert', ('Toget fra %s til %s kjører klokken %s fra spor %s.' % (self.getStation(), destination_name, dt, platform))]);
+        s.call(['notify-send', '-i', self.icon_large, 'NSB Live', ('Toget fra %s til %s kjører klokken %s fra spor %s.' % (self.getStation(), destination_name, dt, platform))]);
 
     def settings(self, source):
         os.system('xdg-open config.ini')
