@@ -1,6 +1,9 @@
 # NSB Live
 This project is still in development. I will update this README with some pictures soon.
 
+## To-do:
+- Beep sound on alerts
+
 ## Donations
 Please consider donating to support the development.<br>
 With PayPal: TBA<br>
