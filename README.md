@@ -1,11 +1,11 @@
 # NSB Live
-This project is still in development. I will update this README with some pictures soon.
+This project is still in development!
 
-## To-do:
+## To-do list:
 - Beep sound on alerts
 
-## Donations
+## Donations:
 Please consider donating to support the development.<br>
-With PayPal: TBA<br>
 With BTC: 1PgiCMnKq9GJhGVhYQb4Ptr4HJZoVkn2Zc<br>
+With PayPal: TBA<br>
 With ETH: TBA<br>
