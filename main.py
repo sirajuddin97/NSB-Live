@@ -26,7 +26,7 @@ class Indicator():
         self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE);
         self.ind.set_menu(self.create_menu());
 
-        self.update = Thread(target = self.refreshPrice);
+        self.update = Thread(target = self.reloadIndicator);
         self.update.setDaemon(True);
         self.update.start();
 
@@ -63,9 +63,7 @@ class Indicator():
                 dt = "{}:{}".format(dt.hour, dt.minute);
                 now = time.strftime('%H:%M');
                 tdelta = datetime.strptime(dt, '%H:%M') - datetime.strptime(now, '%H:%M');
-                if str(tdelta) < '0:50':
-                    self.trainAlert(destination_name, dt, platform);
-
+                if str(tdelta) < '0:30': self.trainAlert(destination_name, dt, platform);
                 train = ('%s til %s - %s (Spor %s)' % (self.getStation(), destination_name, dt, platform));
                 submenu.append(Gtk.MenuItem(train));
 
@@ -99,14 +97,11 @@ class Indicator():
             district = data['District'];
             return district;
 
-    def refreshPrice(self):
+    def reloadIndicator(self):
         while True:
             time.sleep(self.refresh_rate);
-            print("test");
-            self.create_menu();
-
-            #GObject.idle_add(self.ind.set_label, self.getStation(), self.app, priority = GObject.PRIORITY_DEFAULT);
-            # GObject.idle_add(self.create_menu(), priority = GObject.PRIORITY_DEFAULT);
+            Gtk.main_quit();
+            os.system('python3 main.py');
 
     def trainAlert(self, destination_name, dt, platform):
         s.call(['notify-send', '-i', self.icon_large, 'NSB Live', ('Toget fra %s til %s kjører klokken %s fra spor %s.' % (self.getStation(), destination_name, dt, platform))]);
