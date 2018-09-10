@@ -6,7 +6,7 @@ To be updated.
 ![](https://i.imgur.com/XuQWiNd.png)
 
 ## Configuration:
-There are three settings in the configuration file (*config.ini*), where you can change the application language, refresh rate and your train station ID.
+There are three settings in the configuration file (*config.ini*), where you can change the program language, refresh rate and your train station ID. You must restart the program every time you update the configuration file.
 ```
 [settings]
 language = no
