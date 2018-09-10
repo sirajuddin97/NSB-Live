@@ -63,7 +63,7 @@ class Indicator():
                 dt = "{}:{}".format(dt.hour, dt.minute);
                 now = time.strftime('%H:%M');
                 tdelta = datetime.strptime(dt, '%H:%M') - datetime.strptime(now, '%H:%M');
-                if str(tdelta) < '0:30': self.trainAlert(destination_name, dt, platform);
+                if str(tdelta) < '0:20': self.trainAlert(destination_name, dt, platform);
                 train = ('%s til %s - %s (Spor %s)' % (self.getStation(), destination_name, dt, platform));
                 submenu.append(Gtk.MenuItem(train));
 
