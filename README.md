@@ -17,6 +17,8 @@ station_id = 6049104
 
 **Refresh rate:** Amount of delay in seconds between each lookup. 300 seconds (5 minutes) is recommended.
 
-**Station ID:** Go to https://ruter.no/reiseplanlegger/ and enter your station information (departure/arrival). Click "Find journey" and copy your station ID from the URL (looks something like this: /reiseplanlegger/Mellom/Fra/**(6021000)**). Paste this ID in your configuration file and restart the program.
+**Station ID:** Go to https://ruter.no/reiseplanlegger and enter your station information (departure/arrival). Click "Find journey" and copy your station ID from the URL (it looks something like this: .../reiseplanlegger/Mellom/Fra/**(6021000)**). Paste this ID in your configuration file and restart the program.
 ![](https://i.imgur.com/3SnsPtA.png)
 ![](https://i.imgur.com/xMyzeN7.png)
+
+Let me know if you have any questions. Enjoy and good luck!
