@@ -110,7 +110,7 @@ class Indicator():
         os.system('xdg-open config.ini')
 
     def github(self, source):
-        webbrowser.open('https://github.com/sirajuddin97/NSBAlert');
+        webbrowser.open('https://github.com/sirajuddin97/NSBLive');
 
     def stop(self, source):
         Gtk.main_quit();
